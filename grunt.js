@@ -10,19 +10,8 @@ module.exports = function(grunt) {
         '* Copyright (c) <%= grunt.template.today("yyyy") %> <%= pkg.author.name %>;' +
         ' Licensed <%= _.pluck(pkg.licenses, "type").join(", ") %> */'
     },
-    coffee : {
-      helpers : {
-        src  : 'spec/coffeescripts/helpers/*.coffee',
-        dest : 'spec/javascripts/helpers'
-      },
-      specs : {
-        src  : 'spec/coffeescripts/*.coffee',
-        dest : 'spec/javascripts'
-      },
-      plugin : {
-        src  : 'js/*.coffee',
-        dest : 'js'
-      }
+    lint: {
+      files: ['grunt.js', 'js/*.js', 'spec/javascripts/*Spec.js']
     },
     jasmine : {
       src     : ['js/libs/**/*.js', 'js/*[^(min)].js', 'spec/javascripts/libs/**/*.js'],
@@ -30,14 +19,10 @@ module.exports = function(grunt) {
       specs   : 'spec/javascripts/**/*.js'
     },
     watch : {
-      files: ['<config:coffee.helpers.src>', '<config:coffee.specs.src>', '<config:coffee.plugin.src>'],
-      tasks: 'coffee growl:coffee jasmine growl:jasmine'
+      files: ['spec/javascripts/helpers/*.js', 'spec/javascripts/*Spec.js', 'js/*.js'],
+      tasks: 'lint jasmine growl:jasmine'
     },
     growl : {
-      coffee : {
-        title   : 'CoffeeScript',
-        message : 'Compiled successfully'
-      },
       jasmine : {
         title   : 'Jasmine',
         message : 'Tests passed successfully'
@@ -54,10 +39,9 @@ module.exports = function(grunt) {
   // Lib tasks.
   grunt.loadNpmTasks('grunt-growl');
   grunt.loadNpmTasks('grunt-jasmine-runner');
-  grunt.loadNpmTasks('grunt-coffee');
 
   // Default task.
-  grunt.registerTask('default', 'coffee growl:coffee jasmine growl:jasmine');  
+  grunt.registerTask('default', 'lint jasmine growl:jasmine');  
 
   // Travis CI task.
   grunt.registerTask('travis', 'coffee jasmine');
