@@ -4,7 +4,7 @@ jQuery Plugin Boilerplate written in plain Javascript (based on [CoffeeScript jQ
 
 ## Version
 
-v1.0 Stable
+v1.1 Stable
 
 ## Bug tracker
 
