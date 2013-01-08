@@ -3,52 +3,71 @@ module.exports = function(grunt) {
   // Project configuration.
   grunt.initConfig({
     pkg: grunt.file.readJSON('package.json'),
-    // meta: {
-    //   banner : '/*! <%= pkg.title || pkg.name %> - v<%= pkg.version %> - ' +
-    //     '<%= grunt.template.today("yyyy-mm-dd") %>\n' +
-    //     '<%= pkg.homepage ? "* " + pkg.homepage + "\n" : "" %>' +
-    //     '* Copyright (c) <%= grunt.template.today("yyyy") %> <%= pkg.author.name %>;' +
-    //     ' Licensed <%= _.pluck(pkg.licenses, "type").join(", ") %> */'
-    // },
-    jshint: {
-      files: ['Gruntfile.js', 'js/*.js', 'spec/javascripts/*Spec.js']
+    meta: {
+      banner: "/*!\n" +
+        " *  Project: <%= pkg.title || pkg.name %>\n" +
+        " *  Version: <%= pkg.version %> (<%= grunt.template.today('yyyy-mm-dd') %>)\n" +
+        " *  Description: <%= pkg.description %>\n" +
+        " *  Author: <%= pkg.author.name %> <<%= pkg.author.email %>>\n" +
+        "<%= pkg.homepage ? ' *  Homepage: ' + pkg.homepage + '\\n' : '' %>" +
+        " *  License: <%= _.pluck(pkg.licenses, 'type').join(', ') %>\n" +
+        "*/\n"
     },
-    // jasmine : {
-    //   src     : ['js/libs/**/*.js', 'js/*[^(min)].js', 'spec/javascripts/libs/**/*.js'],
-    //   helpers : 'spec/javascripts/helpers/**/*.js',
-    //   specs   : 'spec/javascripts/**/*.js'
-    // },
+    jshint: {
+      files: ['Gruntfile.js', 'js/*[^(min)].js', 'spec/javascripts/*Spec.js']
+    },
+    jasmine: {
+      src: ['js/*[^(min)].js', 'spec/javascripts/libs/**/*.js'],
+      options: {
+        specs: 'spec/javascripts/*Spec.js',
+        helpers: 'spec/javascripts/helpers/**/*.js',
+        vendor: 'js/vendor/**/*.js'
+      }
+    },
     watch: {
       files: ['<%= jshint.files %>'],
-      tasks: ['jshint']
+      tasks: ['jshint', 'jasmine']
+    },
+    clean: {
+      uglify: ['js/<%= pkg.name %>.min.js']
+    },
+    uglify: {
+      options: {
+        banner: '<%= meta.banner %>'
+      },
+      dist: {
+        files: {
+          'js/<%= pkg.name %>.min.js': ['js/<%= pkg.name %>.js']
+        }
+      }
+    },
+    notify: {
+      uglify: {
+        options: {
+          title: 'UglifyJS',
+          message: 'Files compressed successfully'
+        }
+      },
+      jasmine: {
+        options: {
+          title: 'Jasmine',
+          message: 'Tests passed successfully'
+        }
+      }
     }
-    // watch : {
-    //   files: ['spec/javascripts/helpers/*.js', 'spec/javascripts/*Spec.js', 'js/*.js'],
-    //   tasks: 'lint jasmine growl:jasmine'
-    // },
-    // growl : {
-    //   jasmine : {
-    //     title   : 'Jasmine',
-    //     message : 'Tests passed successfully'
-    //   }
-    // },
-    // min : {
-    //   dist : {
-    //     src  : ['<banner:meta.banner>', 'js/<%= pkg.name %>.js'],
-    //     dest : 'js/<%= pkg.name %>.min.js'
-    //   }
-    // }
   });
 
   // Lib tasks.
   grunt.loadNpmTasks('grunt-contrib-jshint');
+  grunt.loadNpmTasks('grunt-contrib-clean');
+  grunt.loadNpmTasks('grunt-contrib-uglify');
   grunt.loadNpmTasks('grunt-contrib-watch');
+  grunt.loadNpmTasks('grunt-contrib-jasmine');
   grunt.loadNpmTasks('grunt-notify');
-  // grunt.loadNpmTasks('grunt-growl');
-  // grunt.loadNpmTasks('grunt-jasmine-runner');
 
   // Default task.
-  grunt.registerTask('default', 'jshint');  
+  grunt.registerTask('default', ['jshint', 'jasmine', 'notify:jasmine']);
+  grunt.registerTask('compress', ['clean:uglify', 'jshint', 'uglify:dist', 'notify:uglify']);
 
   // Travis CI task.
 //  grunt.registerTask('travis', 'coffee jasmine');
