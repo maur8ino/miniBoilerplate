@@ -47,7 +47,7 @@ describe('PluginName', function() {
       return expect(this.plugin.somePrivateMethod).toBeUndefined();      
     });
     it('should call a private method inside a public methods', function() {
-      return expect(this.plugin.somePublicMethod()).toBe('this is a private method');      
+      return expect(this.plugin.somePublicMethod()).toBe('this is a private method');
     });
   });
 });
